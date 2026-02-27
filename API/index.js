@@ -2,50 +2,39 @@ const express = require('express');
 const app = express();
 app.use(express.json());
 
-// ─────────────────────────────────
-//  PRIME NUMBER for secure math
-// ─────────────────────────────────
-const PRIME = 2083n;  // n means BigInt
 
-// ─────────────────────────────────
-//  STEP 1: Generate Shares
-// ─────────────────────────────────
+const PRIME = 2083n;  
+
+
 function generateShares(secret, k, n) {
-    // Build polynomial coefficients
-    // f(x) = secret + a1*x + a2*x^2 ...
-    const coefficients = [BigInt(secret)];  // a0 = secret
-
+    
+    const coefficients = [BigInt(secret)];  
     for (let i = 1; i < k; i++) {
-        // random coefficients a1, a2 ...
+       
         const random = BigInt(Math.floor(Math.random() * 1000) + 1);
         coefficients.push(random);
     }
 
-    // Generate n shares using f(1), f(2) ... f(n)
+   
     const shares = [];
     for (let x = 1; x <= n; x++) {
         let y = 0n;
         for (let i = 0; i < coefficients.length; i++) {
             y += coefficients[i] * (BigInt(x) ** BigInt(i));
         }
-        y = ((y % PRIME) + PRIME) % PRIME;  // handle negative mod
+        y = ((y % PRIME) + PRIME) % PRIME;  
         shares.push({ x: x, y: y.toString() });
     }
 
     return shares;
 }
 
-// ─────────────────────────────────
-//  STEP 2: Modular Inverse
-// ─────────────────────────────────
-function modInverse(a, p) {
-    a = ((a % p) + p) % p;  // handle negative
-    return a ** (p - 2n) % p;  // Fermat's little theorem
-}
 
-// ─────────────────────────────────
-//  STEP 3: Reconstruct Secret
-// ─────────────────────────────────
+function modInverse(a, p) {
+    a = ((a % p) + p) % p; 
+    return a ** (p - 2n) % p;  
+
+
 function reconstructSecret(shares) {
     let secret = 0n;
 
@@ -71,11 +60,9 @@ function reconstructSecret(shares) {
     return secret.toString();
 }
 
-// ─────────────────────────────────
-//  ROUTES
-// ─────────────────────────────────
 
-// Route 1 - Info
+
+
 app.get('/api/sss/info', (req, res) => {
     res.json({
         algorithm: "Shamir's Secret Sharing",
@@ -88,11 +75,11 @@ app.get('/api/sss/info', (req, res) => {
     });
 });
 
-// Route 2 - Split
+
 app.post('/api/sss/split', (req, res) => {
     const { secret, k, n } = req.body;
 
-    // Validations
+   
     if (secret === undefined)
         return res.status(400).json({ error: 'secret is required' });
     if (secret < 0)
@@ -114,11 +101,11 @@ app.post('/api/sss/split', (req, res) => {
     });
 });
 
-// Route 3 - Reconstruct
+
 app.post('/api/sss/reconstruct', (req, res) => {
     const { shares, k } = req.body;
 
-    // Validations
+    
     if (!shares || shares.length === 0)
         return res.status(400).json({ error: 'shares array is required' });
     if (shares.length < 2)
@@ -134,9 +121,7 @@ app.post('/api/sss/reconstruct', (req, res) => {
     });
 });
 
-// ─────────────────────────────────
-//  START SERVER
-// ─────────────────────────────────
+
 app.listen(3000, () => {
     console.log('SSS API running on port 3000');
 });
