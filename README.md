@@ -13,6 +13,7 @@ I HAVE DEVELOPED A PROJECT USING   **REST API**  WITH  **THREE**  ENDPOINTS  AND
 
 ### END POINTS OF THE API:
 
+
                      1) info         -    INFORMATION OF THE API 
                      2) split        -    USED TO SPLIT THE SECRET AMONG THE (n) VALUES 
                      3) reconstruct  -    USING THE LAGRANGE INTERPOLATION IT WILL FIND OR RECONSTRUCT THE SECRET 
